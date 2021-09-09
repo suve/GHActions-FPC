@@ -1,7 +1,13 @@
 const core = require('@actions/core');
+const exec = require('@actions/exec');
 
-try {
-	console.log('Hello World!');
-} catch (e) {
-	core.setFailed(e.message);
+async function main() {
+	try {
+		let sourceFile = core.getInput('source');
+		await exec.exec('fpc', [sourceFile]);
+	} catch (e) {
+		core.setFailed(e.message);
+	}
 }
+
+main();
