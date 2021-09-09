@@ -1,0 +1,17 @@
+{
+	"name": "GHActions-FPC",
+	"description": "GitHub action for running the Free Pascal Compiler",
+	"version": "0.1.0",
+	"license": "Zlib",
+	"author": "suve",
+	"repository": "https://github.com/suve/GHActions-FPC",
+	"scripts": {
+		"build": "ncc build src/main.js --out dist --minify --license licence.txt"
+	},
+	"dependencies": {
+		"@actions/core": "^1.5.0"
+	},
+	"devDependencies": {
+		"@vercel/ncc": "^0.31.0"
+	}
+}

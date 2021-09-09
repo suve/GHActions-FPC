@@ -1,0 +1,6 @@
+name: 'Free Pascal Compiler'
+description: 'Compile Pascal code using FPC'
+author: 'suve'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
