@@ -6,6 +6,10 @@ inputs:
     name: 'Full path to fpc executable'
     required: false
     default: ''
+  flags:
+    name: 'FPC flags (space-separated)'
+    required: false
+    default: ''
   source:
     name: 'Main source file to be compiled'
     required: true

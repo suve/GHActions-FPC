@@ -52,6 +52,15 @@ function findFpc() {
 	throw new Error('Unable to locate fpc executable');
 }
 
+function getFlags() {
+	let flags = core.getInput('flags');
+	if(flags === '') return [];
+
+	return flags.split(' ').filter(function(element){
+		return element !== '';
+	});
+}
+
 async function main() {
 	try {
 		let fpc = core.getInput('fpc');
@@ -59,8 +68,11 @@ async function main() {
 			fpc = await findFpc();
 		}
 
+		let flags = getFlags();
 		let sourceFile = core.getInput('source');
-		await exec.exec(fpc, [sourceFile]);
+
+		flags.push(sourceFile);
+		await exec.exec(fpc, flags);
 	} catch (e) {
 		core.setFailed(e.message);
 	}
