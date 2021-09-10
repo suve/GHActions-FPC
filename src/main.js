@@ -13,11 +13,26 @@ function dirExists(path) {
 	}	
 }
 
+function getFilteredSubdirs(dir, pattern) {
+	let filter = function(entry) {
+		if(!entry.isDirectory()) return false;
+		return pattern.test(entry.name);
+	};
+
+	return fs
+		.readdirSync(dir, { 'withFileTypes': true })
+		.filter(filter)
+		.map(entry => entry.name)
+	;
+}
+
 function findFpc() {
 	// On non-Windows platforms, assume fpc can be found somewhere in PATH
 	if(process.platform !== 'win32') {
 		return 'fpc';
 	}
+
+	const semverRegexp = /^\d+\.\d+\.\d+$/;
 
 	let dirsToCheck = [
 		'C:/fpc',
@@ -30,19 +45,15 @@ function findFpc() {
 	for(let d = 0; d < dirsToCheck.length; ++d) {
 		if(!dirExists(dirsToCheck[d])) continue;
 
-		// TODO: Filter the subdir list so we only go into dirs matching the "^\d*\.\d*\.\d*$" pattern.
-		// TODO: Sort the subdir list so we go into greatest X.Y.Z first.
-		let subdirs = fs.readdirSync(dirsToCheck[d], { 'withFileTypes': true });
-		for(let s = 0; s < subdirs.length; ++s) {
-			if(!subdirs[s].isDirectory()) continue;
-			
+		let subdirs = getFilteredSubdirs(dirsToCheck[d], semverRegexp).sort();
+		for(let s = (subdirs.length - 1); s >= 0; --s) {
 			let compilerNames = [
 				'x86_64-win64',
 				'x86_64-win32',
 				'i386-win32',
 			];
 			for(let c = 0; c < compilerNames.length; ++c) {
-				let fullPath = dirsToCheck[d] + '/' + subdirs[s].name + '/bin/' + compilerNames[c] + '/fpc.exe';
+				let fullPath = dirsToCheck[d] + '/' + subdirs[s] + '/bin/' + compilerNames[c] + '/fpc.exe';
 				if(fs.existsSync(fullPath)) {
 					return fullPath;
 				}
@@ -56,9 +67,7 @@ function getFlags() {
 	let flags = core.getInput('flags');
 	if(flags === '') return [];
 
-	return flags.split(' ').filter(function(element){
-		return element !== '';
-	});
+	return flags.split(' ').filter(elem => elem !== '');
 }
 
 async function main() {
