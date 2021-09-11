@@ -4,11 +4,12 @@ This GitHub Action allows you to compile Pascal programs using the Free Pascal C
 
 ## Inputs
 
-| Name     | Required | Description            | Default     |
-| -------- | :------: | ---------------------- | ----------- |
-| `fpc`    |          | FPC executable to use. | _see below_ |
-| `flags`  |          | Flags passed to FPC.   |             |
-| `source` | Yes      | Main source file.      |             |
+| Name      | Required | Description            | Default     |
+| --------- | :------: | ---------------------- | ----------- |
+| `fpc`     |          | FPC executable to use. | _see below_ |
+| `flags`   |          | Flags passed to FPC.   |             |
+| `source`  | Yes      | Main source file.      |             |
+| `workdir` |          | Working directory      |             |
 
 The `fpc` input can be used to provide a full path to the Free Pascal Compiler executable.
 When omitted, the Action behaves as follows:

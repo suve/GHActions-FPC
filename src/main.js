@@ -79,9 +79,15 @@ async function main() {
 
 		let flags = getFlags();
 		let sourceFile = core.getInput('source');
-
 		flags.push(sourceFile);
-		await exec.exec(fpc, flags);
+
+		let options = {};
+		let workdir = core.getInput('workdir');
+		if(workdir !== '') {
+			options.cwd = workdir;
+		}
+
+		await exec.exec(fpc, flags, options);
 	} catch (e) {
 		core.setFailed(e.message);
 	}
