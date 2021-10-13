@@ -4,12 +4,15 @@ This GitHub Action allows you to compile Pascal programs using the Free Pascal C
 
 ## Inputs
 
-| Name      | Required | Description            | Default     |
-| --------- | :------: | ---------------------- | ----------- |
-| `fpc`     |          | FPC executable to use. | _see below_ |
-| `flags`   |          | Flags passed to FPC.   |             |
-| `source`  | Yes      | Main source file.      |             |
-| `workdir` |          | Working directory      |             |
+| Name        | Required | Description            | Default     |
+| ----------- | :------: | ---------------------- | ----------- |
+| `fpc`       |          | FPC executable to use. | _see below_ |
+| `flags`     |          | Flags passed to FPC.   |             |
+| `source`    | Yes      | Main source file.      |             |
+| `verbosity` |          | Verbosity level.       | `ew`        |
+| `workdir`   |          | Working directory.     |             |
+
+### fpc
 
 The `fpc` input can be used to provide a full path to the Free Pascal Compiler executable.
 When omitted, the Action behaves as follows:
@@ -18,5 +21,24 @@ When omitted, the Action behaves as follows:
   `X.Y.Z` stands for the version number of fpc. If multiple versions are found, the latest is preferred.
   * `C:\fpc\X.Y.Z`
   * `C:\Program Files\fpc\X.Y.Z`
+  * `C:\Program Files (x86)\fpc\X.Y.Z`
   * `C:\lazarus\fpc\X.Y.Z`
   * `C:\Program Files\lazarus\fpc\X.Y.Z`
+  * `C:\Program Files (x86)\lazarus\fpc\X.Y.Z`
+
+### verbosity
+
+The `verbosity` input can be used to control the desired verbosity level.
+The value can be any combination of the following letters:
+- `e` for errors
+- `w` for warnings
+- `n` for notes
+- `h` for hints
+
+Note that these are "precise", i.e. a value of `n` will result in just the notes being printed,
+without errors or warnings. You need `ewn` (or `new`, the order doesn't matter) if you want all three.
+
+Implementation-wise, the flags passed to the Free Pascal compiler are `-v0 -viXXX`,
+where `XXX` is the value for this input.
+As such, if you want to set the verbosity level through the `flags` input,
+you **need** to set this input to an empty string - this disables adding the two `-v` flags.

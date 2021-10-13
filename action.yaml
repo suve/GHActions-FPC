@@ -3,18 +3,22 @@ description: 'Compile Pascal code using FPC'
 author: 'suve'
 inputs:
   fpc:
-    name: 'Full path to fpc executable'
+    description: 'Full path to fpc executable'
     required: false
     default: ''
   flags:
-    name: 'FPC flags (space-separated)'
+    description: 'FPC flags (space-separated)'
     required: false
     default: ''
   source:
-    name: 'Main source file to compile'
+    description: 'Main source file to compile'
     required: true
+  verbosity:
+    description: 'Verbosity level'
+    required: false
+    default: 'ew'
   workdir:
-    name: 'Working directory to use'
+    description: 'Working directory to use'
     required: false
     default: ''
 runs:

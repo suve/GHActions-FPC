@@ -6,10 +6,27 @@ import { Parser } from './parser.mjs';
 
 
 function getFlags() {
-	let flags = core.getInput('flags');
-	if(flags === '') return [];
+	let flags = [];
 
-	return flags.split(' ').filter(elem => elem !== '');
+	const argFlags = core.getInput('flags');
+	if(argFlags !== '') {
+		flags = argFlags.split(' ').filter(elem => elem !== '');
+	}
+
+	const argVerbosity = core.getInput('verbosity');
+	if(argVerbosity.length > 0) {
+		for (let i = 0; i < argVerbosity.length; ++i) {
+			let char = argVerbosity.charAt(i);
+			if((char !== 'e') && (char !== 'w') && (char !== 'n') && (char !== 'h')) {
+				throw new Error(`Value for the "verbosity" input contains an illegal character: "${char}" (only 'e', 'w', 'n', 'h' are allowed)`);
+			}
+		}
+		// Push the -v0 flag first to set verbosity to minimum. This serves to "remove" any defaults set by fpc.cfg.
+		// Next, push the desired verbosity level. "i" (the "info" level) is added simply because of personal preference.
+		flags.push('-v0', '-vi' + argVerbosity)
+	}
+
+	return flags;
 }
 
 function printStats(parser) {
@@ -41,8 +58,6 @@ async function main() {
 		}
 
 		let flags = getFlags();
-		flags.push('-vewnh'); // TODO: Make verbosity configurable
-
 		let sourceFile = core.getInput('source');
 		flags.push(sourceFile);
 
@@ -54,7 +69,7 @@ async function main() {
 
 		let parser = new Parser();
 		options.listeners = {
-			stdline: function(line) {
+			"stdline": function(line) {
 				parser.parseLine(line);
 			}
 		};
