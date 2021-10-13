@@ -61,7 +61,10 @@ async function main() {
 		let sourceFile = core.getInput('source');
 		flags.push(sourceFile);
 
-		let options = {};
+		let options = {
+			"ignoreReturnCode": true
+		};
+
 		let workdir = core.getInput('workdir');
 		if(workdir !== '') {
 			options.cwd = workdir;
@@ -74,8 +77,12 @@ async function main() {
 			}
 		};
 
-		await exec.exec(fpc, flags, options);
+		let exitCode = await exec.exec(fpc, flags, options);
 		printStats(parser);
+
+		if(exitCode !== 0) {
+			core.setFailed(`FPC exited with code ${exitCode}`)
+		}
 	} catch (e) {
 		core.setFailed(e.message);
 	}
