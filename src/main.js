@@ -1,11 +1,11 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 
-import { findFpc } from './find-fpc.mjs';
+import { getInputs } from './inputs.mjs';
 import { Parser } from './parser.mjs';
 
 
-function getFlags() {
+function getExecFlags() {
 	let flags = [];
 
 	const argFlags = core.getInput('flags');
@@ -26,17 +26,38 @@ function getFlags() {
 		flags.push('-v0', '-vi' + argVerbosity)
 	}
 
+	const sourceFile = core.getInput('source');
+	flags.push(sourceFile);
+
 	return flags;
 }
 
-function printStats(parser) {
+function getExecOptions(parser) {
+	let options = {
+		"ignoreReturnCode": true
+	};
+
+	let workdir = core.getInput('workdir');
+	if(workdir !== '') {
+		options.cwd = workdir;
+	}
+
+	options.listeners = {
+		"stdline": function(line) {
+			parser.parseLine(line);
+		}
+	};
+
+	return options;
+}
+
+function printStats(parserData) {
 	const width = 6;
 
-	const data = parser.getData();
-	const err = data.errors.length.toString().padStart(width);
-	const war = data.warnings.length.toString().padStart(width);
-	const not = data.notes.length.toString().padStart(width);
-	const hin = data.hints.length.toString().padStart(width);
+	const err = parserData.errors.length.toString().padStart(width);
+	const war = parserData.warnings.length.toString().padStart(width);
+	const not = parserData.notes.length.toString().padStart(width);
+	const hin = parserData.hints.length.toString().padStart(width);
 
 	core.info(`
 -= GHActions-FPC =-
@@ -50,39 +71,35 @@ function printStats(parser) {
 `);
 }
 
+function checkFail(exitCode, inputs, parserData) {
+	if((inputs.failOn.error) && (parserData.errors.length > 0)) {
+		throw new Error(`${parserData.errors.length} errors were emitted`)
+	}
+	if((inputs.failOn.warning) && (parserData.warnings.length > 0)) {
+		throw new Error(`${parserData.warnings.length} warnings were emitted and fail-on-warning is enabled`)
+	}
+	if((inputs.failOn.note) && (parserData.notes.length > 0)) {
+		throw new Error(`${parserData.notes.length} notes were emitted and fail-on-note is enabled`)
+	}
+	if((inputs.failOn.hint) && (parserData.hints.length > 0)) {
+		throw new Error(`${parserData.hints.length} hints were emitted and fail-on-hint is enabled`)
+	}
+	if(exitCode !== 0) {
+		throw new Error(`FPC exited with code ${exitCode}`)
+	}
+}
+
 async function main() {
 	try {
-		let fpc = core.getInput('fpc');
-		if(fpc === '') {
-			fpc = await findFpc();
-		}
-
-		let flags = getFlags();
-		let sourceFile = core.getInput('source');
-		flags.push(sourceFile);
-
-		let options = {
-			"ignoreReturnCode": true
-		};
-
-		let workdir = core.getInput('workdir');
-		if(workdir !== '') {
-			options.cwd = workdir;
-		}
-
+		let inputs = await getInputs();
 		let parser = new Parser();
-		options.listeners = {
-			"stdline": function(line) {
-				parser.parseLine(line);
-			}
-		};
 
-		let exitCode = await exec.exec(fpc, flags, options);
-		printStats(parser);
+		let flags = getExecFlags();
+		let options = getExecOptions(parser);
+		let exitCode = await exec.exec(inputs.fpc, flags, options);
 
-		if(exitCode !== 0) {
-			core.setFailed(`FPC exited with code ${exitCode}`)
-		}
+		printStats(parser.getData());
+		checkFail(exitCode, inputs, parser.getData());
 	} catch (e) {
 		core.setFailed(e.message);
 	}

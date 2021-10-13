@@ -2,6 +2,10 @@ name: 'Free Pascal Compiler'
 description: 'Compile Pascal code using FPC'
 author: 'suve'
 inputs:
+  fail-on:
+    description: 'Strictness level'
+    required: false
+    default: 'e'
   fpc:
     description: 'Full path to fpc executable'
     required: false

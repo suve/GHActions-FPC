@@ -6,11 +6,26 @@ This GitHub Action allows you to compile Pascal programs using the Free Pascal C
 
 | Name        | Required | Description            | Default     |
 | ----------- | :------: | ---------------------- | ----------- |
+| `fail-on`   |          | Strictness level.      | `e`         |
 | `fpc`       |          | FPC executable to use. | _see below_ |
 | `flags`     |          | Flags passed to FPC.   |             |
 | `source`    | Yes      | Main source file.      |             |
 | `verbosity` |          | Verbosity level.       | `ew`        |
 | `workdir`   |          | Working directory.     |             |
+
+### fail-on
+
+The `fail-on` input can be used to control when the action should fail.
+By default, the action will fail only if an error occurs (or if the compiler crashes).
+If you want to be more strict with your code, you can use this option to have the action
+mark itself as "failed" when any warnings occur.
+
+With a C compiler, you could use the `-Werror` compiler option to have the compiler treat any
+warnings as errors; however, FPC does not have an equivalent option.
+
+The value for this input follows the same rules as the one for `verbosity`.
+Note that setting this input does **not** affect `verbosity` - if you use `ew` for `fail-on`,
+you **must** have `ew` in your verbosity settings.
 
 ### fpc
 
