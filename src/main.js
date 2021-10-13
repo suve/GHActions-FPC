@@ -43,6 +43,7 @@ function getExecOptions(parser) {
 	}
 
 	options.listeners = {
+		"outStream": null,
 		"stdline": function(line) {
 			parser.parseLine(line);
 		}
@@ -69,6 +70,33 @@ function printStats(parserData) {
 | Note          | ${not} |
 | Hint          | ${hin} |
 `);
+}
+
+function emitAnnotations(parserData) {
+	let parserLineToAnnotationProps = function(line) {
+		return {
+			"file": line.file,
+			"startLine": line.line,
+			"startColumn": line.column,
+		};
+	}
+
+	for(let i = 0; i < parserData.errors.length; ++i) {
+		const e = parserData.errors[i];
+		core.error(e.message, parserLineToAnnotationProps(e));
+	}
+	for(let i = 0; i < parserData.warnings.length; ++i) {
+		const w = parserData.warnings[i];
+		core.warning(w.message, parserLineToAnnotationProps(w));
+	}
+	for(let i = 0; i < parserData.notes.length; ++i) {
+		const n = parserData.notes[i];
+		core.notice(n.message, parserLineToAnnotationProps(n));
+	}
+	for(let i = 0; i < parserData.hints.length; ++i) {
+		const h = parserData.hints[i];
+		core.notice(h.message, parserLineToAnnotationProps(h));
+	}
 }
 
 function checkFail(exitCode, inputs, parserData) {
@@ -99,6 +127,8 @@ async function main() {
 		let exitCode = await exec.exec(inputs.fpc, flags, options);
 
 		printStats(parser.getData());
+		emitAnnotations(parser.getData());
+
 		checkFail(exitCode, inputs, parser.getData());
 	} catch (e) {
 		core.setFailed(e.message);
