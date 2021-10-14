@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 
@@ -43,7 +45,6 @@ function getExecOptions(parser) {
 	}
 
 	options.listeners = {
-		"outStream": null,
 		"stdline": function(line) {
 			parser.parseLine(line);
 		}
@@ -72,10 +73,16 @@ function printStats(parserData) {
 `);
 }
 
-function emitAnnotations(parserData) {
+function emitAnnotations(parserData, workdir) {
+	if(typeof workdir === "string") {
+		workdir = path.relative(".", workdir) + path.sep;
+	} else {
+		workdir = "";
+	}
+
 	let parserLineToAnnotationProps = function(line) {
 		let props = {
-			"file": line.file,
+			"file": workdir + line.file,
 			"startLine": line.line,
 		};
 		if(line.column > 0) {
@@ -130,7 +137,7 @@ async function main() {
 		let exitCode = await exec.exec(inputs.fpc, flags, options);
 
 		printStats(parser.getData());
-		emitAnnotations(parser.getData());
+		emitAnnotations(parser.getData(), options.cwd);
 
 		checkFail(exitCode, inputs, parser.getData());
 	} catch (e) {

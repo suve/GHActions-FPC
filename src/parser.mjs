@@ -4,7 +4,7 @@ function Parser() {
 		"warnings": [],
 		"notes": [],
 		"hints": [],
-	}
+	};
 
 	this.getData = function() {
 		return this._data;
@@ -17,7 +17,7 @@ function Parser() {
 		const check = diagnosticRegexp.exec(text);
 		if(check === null) return false;
 
-		const file = check[1]; // TODO: Adjust this according to 'workdir' input
+		const file = check[1];
 		const line = Number(check[2]);
 		const column = (check[3] !== undefined) ? Number(check[3]) : null;
 		const type = check[4].toLowerCase();
