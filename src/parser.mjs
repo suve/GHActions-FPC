@@ -13,7 +13,7 @@ function Parser() {
 	this.parseLine = function(text) {
 		text = text.trim();
 
-		const diagnosticRegexp = /^(.+)\((\d+),(\d+)\) (Error|Warning|Note|Hint): (.+)$/;
+		const diagnosticRegexp = /^(.+)\((\d+),(\d+)\) (Fatal|Error|Warning|Note|Hint): (.+)$/;
 		const check = diagnosticRegexp.exec(text);
 		if(check === null) return false;
 
@@ -25,7 +25,7 @@ function Parser() {
 			"type": type,
 			"message": check[5],
 		}
-		if(type === "error") {
+		if((type === "error") || (type === "fatal")) {
 			this._data.errors.push(diagObj);
 		} else if(type === "warning") {
 			this._data.warnings.push(diagObj);
