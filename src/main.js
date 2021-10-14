@@ -2,6 +2,7 @@ import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 
 import { emitAnnotations } from './annotations.mjs';
+import { checkFpcVersion } from './fpc.mjs';
 import { getInputs } from './inputs.mjs';
 import { Parser } from './parser.mjs';
 
@@ -93,10 +94,13 @@ function checkFail(exitCode, inputs, parserData) {
 }
 
 async function main() {
-	try {
-		let inputs = await getInputs();
-		let parser = new Parser();
+	const MIN_VERSION = '2.1.2';
 
+	try {
+		let inputs = getInputs();
+		await checkFpcVersion(inputs.fpc, MIN_VERSION);
+
+		let parser = new Parser();
 		let flags = getExecFlags();
 		let options = getExecOptions(parser);
 		let exitCode = await exec.exec(inputs.fpc, flags, options);

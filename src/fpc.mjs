@@ -1,6 +1,10 @@
 import * as fs from 'fs';
 import * as process from 'process';
 
+import * as exec from "@actions/exec";
+import { default as semverGt } from "semver/functions/gt.js";
+import { default as semverValid } from "semver/functions/valid.js";
+
 function dirExists(path) {
 	try {
 		let stat = fs.statSync(path);
@@ -60,6 +64,38 @@ function findFpc() {
 	throw new Error('Unable to locate fpc executable');
 }
 
+async function getFpcVersion(fpc) {
+	let version = null;
+	const options = {
+		"ignoreReturnCode": true,
+		"listeners": {
+			"stdline": function(line) {
+				if(version === null) version = line;
+			},
+		},
+	};
+
+	let exitCode = await exec.exec(fpc, ["-iV"], options);
+	if((exitCode !== 0) || (version === null)) {
+		throw new Error("Failed to determine FPC version");
+	}
+
+	let semver = semverValid(version.trim());
+	if(semver === null) {
+		throw new Error(`Failed to parse FPC version: "version"`);
+	}
+	return semver;
+}
+
+async function checkFpcVersion(fpc, minimumVersion) {
+	let version = await getFpcVersion(fpc);
+	if(semverGt(minimumVersion, version)) {
+		throw new Error(`Detected FPC version ${version}, but a minimum of ${minimumVersion} is required`)
+	}
+}
+
 export {
+	checkFpcVersion,
 	findFpc,
+	getFpcVersion,
 };

@@ -1,6 +1,6 @@
 import * as core from '@actions/core';
 
-import { findFpc } from './find-fpc.mjs';
+import { findFpc } from './fpc.mjs';
 
 
 function getFailOn() {
@@ -30,22 +30,19 @@ function getFailOn() {
 	return result;
 }
 
-async function getFpc() {
+function getFpc() {
 	let fpc = core.getInput('fpc');
 	if(fpc === '') {
-		fpc = await findFpc();
+		fpc = findFpc();
 	}
 
 	return fpc;
 }
 
-async function getInputs() {
-	const failOn = getFailOn();
-	const fpc = await getFpc();
-
+function getInputs() {
 	return {
-		"failOn": failOn,
-		"fpc": fpc
+		"failOn": getFailOn(),
+		"fpc": getFpc(),
 	};
 }
 

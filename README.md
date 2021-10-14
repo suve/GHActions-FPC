@@ -62,17 +62,18 @@ you **need** to set this input to an empty string - this disables adding the two
 ## Getting FPC
 
 This Action assumes that FPC is already installed in your build environment; it does not handle
-installing it for you. You can do that yourself by adding one of the following steps
-to your GHActions workflow.
+installing it for you. The minimum required version is 2.1.2 (released March 2007).
+
+You can install FPC yourself by adding one of the following steps to your GHActions workflow.
 
 ### Ubuntu
 
 ```
 - name: Install FPC
   run: |
-     export DEBIAN_FRONTEND=noninteractive
-     sudo apt-get update
-     sudo apt-get install -y fpc
+    export DEBIAN_FRONTEND=noninteractive
+    sudo apt-get update
+    sudo apt-get install -y fpc
 ```
 
 ### MacOS
