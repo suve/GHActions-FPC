@@ -1,8 +1,7 @@
-import * as path from 'path';
-
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 
+import { emitAnnotations } from './annotations.mjs';
 import { getInputs } from './inputs.mjs';
 import { Parser } from './parser.mjs';
 
@@ -71,42 +70,6 @@ function printStats(parserData) {
 | Note          | ${not} |
 | Hint          | ${hin} |
 `);
-}
-
-function emitAnnotations(parserData, workdir) {
-	if(typeof workdir === "string") {
-		workdir = path.relative(".", workdir) + path.sep;
-	} else {
-		workdir = "";
-	}
-
-	let parserLineToAnnotationProps = function(line) {
-		let props = {
-			"file": workdir + line.file,
-			"startLine": line.line,
-		};
-		if(line.column > 0) {
-			props.startColumn = line.column;
-		}
-		return props;
-	}
-
-	for(let i = 0; i < parserData.errors.length; ++i) {
-		const e = parserData.errors[i];
-		core.error(e.message, parserLineToAnnotationProps(e));
-	}
-	for(let i = 0; i < parserData.warnings.length; ++i) {
-		const w = parserData.warnings[i];
-		core.warning(w.message, parserLineToAnnotationProps(w));
-	}
-	for(let i = 0; i < parserData.notes.length; ++i) {
-		const n = parserData.notes[i];
-		core.notice(n.message, parserLineToAnnotationProps(n));
-	}
-	for(let i = 0; i < parserData.hints.length; ++i) {
-		const h = parserData.hints[i];
-		core.notice(h.message, parserLineToAnnotationProps(h));
-	}
 }
 
 function checkFail(exitCode, inputs, parserData) {
