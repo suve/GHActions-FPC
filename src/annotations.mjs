@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as core from '@actions/core';
 
 
-function parserLineToAnnotationProps(line, workdir) {
+function parserLineToAnnotationProps(line) {
 	const suffix = {
 		"fatal": "Fatal error",
 		"error": "Error",
@@ -12,12 +12,15 @@ function parserLineToAnnotationProps(line, workdir) {
 		"hint": "Hint",
 	};
 
+	let fileName = path.basename(line.path);
+	let filePath = path.relative("", line.path);
+
 	let props = {
-		"file": workdir + line.file,
+		"file": filePath,
 		"startLine": line.line,
 	};
 
-	let title = `${line.file}(${line.line}`;
+	let title = `${fileName}(${line.line}`;
 	if(line.column > 0) {
 		props.startColumn = line.column;
 		title += `,${line.column}`
@@ -29,8 +32,8 @@ function parserLineToAnnotationProps(line, workdir) {
 	return props;
 }
 
-function emitSingleAnnotation(line, workdir) {
-	const props = parserLineToAnnotationProps(line, workdir);
+function emitSingleAnnotation(line) {
+	const props = parserLineToAnnotationProps(line);
 	switch(line.type) {
 		case "fatal":
 		case "error":
@@ -47,24 +50,18 @@ function emitSingleAnnotation(line, workdir) {
 	}
 }
 
-function emitAnnotations(parserData, workdir) {
-	if(typeof workdir === "string") {
-		workdir = path.relative(".", path.normalize(workdir)) + path.sep;
-	} else {
-		workdir = "";
-	}
-
+function emitAnnotations(parserData) {
 	for(const e of parserData.errors) {
-		emitSingleAnnotation(e, workdir);
+		emitSingleAnnotation(e);
 	}
 	for(const w of parserData.warnings) {
-		emitSingleAnnotation(w, workdir);
+		emitSingleAnnotation(w);
 	}
 	for(const n of parserData.notes) {
-		emitSingleAnnotation(n, workdir);
+		emitSingleAnnotation(n);
 	}
 	for(const h of parserData.hints) {
-		emitSingleAnnotation(h, workdir);
+		emitSingleAnnotation(h);
 	}
 }
 

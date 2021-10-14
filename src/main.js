@@ -23,8 +23,10 @@ function getExecFlags() {
 			}
 		}
 		// Push the -v0 flag first to set verbosity to minimum. This serves to "remove" any defaults set by fpc.cfg.
-		// Next, push the desired verbosity level. "i" (the "info" level) is added simply because of personal preference.
-		flags.push('-v0', '-vi' + argVerbosity)
+		// Next, push the desired verbosity level:
+		// - "i" (the "info" level) is added simply because of personal preference.
+		// - "b" (print full paths) is added to make sub-directory handling easier.
+		flags.push('-v0', '-vib' + argVerbosity)
 	}
 
 	const sourceFile = core.getInput('source');
@@ -100,7 +102,7 @@ async function main() {
 		let exitCode = await exec.exec(inputs.fpc, flags, options);
 
 		printStats(parser.getData());
-		emitAnnotations(parser.getData(), options.cwd);
+		emitAnnotations(parser.getData());
 
 		checkFail(exitCode, inputs, parser.getData());
 	} catch (e) {

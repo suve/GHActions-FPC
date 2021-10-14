@@ -54,7 +54,7 @@ The value can be any combination of the following letters:
 Note that these are "precise", i.e. a value of `n` will result in just the notes being printed,
 without errors or warnings. You need `ewn` (or `new`, the order doesn't matter) if you want all three.
 
-Implementation-wise, the flags passed to the Free Pascal compiler are `-v0 -viXXX`,
+Implementation-wise, the flags passed to the Free Pascal compiler are `-v0 -vibXXX`,
 where `XXX` is the value for this input.
 As such, if you want to set the verbosity level through the `flags` input,
 you **need** to set this input to an empty string - this disables adding the two `-v` flags.

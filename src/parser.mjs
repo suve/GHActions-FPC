@@ -17,14 +17,14 @@ function Parser() {
 		const check = diagnosticRegexp.exec(text);
 		if(check === null) return false;
 
-		const file = check[1];
+		const path = check[1];
 		const line = Number(check[2]);
 		const column = (check[3] !== undefined) ? Number(check[3]) : null;
 		const type = check[4].toLowerCase();
 		const message = check[5];
 
 		const diagObj = {
-			"file": file,
+			"path": path,
 			"line": line,
 			"column": column,
 			"type": type,
