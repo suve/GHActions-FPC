@@ -1,6 +1,7 @@
 # GHAction for the Free Pascal Compiler
 
 This GitHub Action allows you to compile Pascal programs using the Free Pascal Compiler.
+It will parse the compiler's diagnostics and create annotations on your commits and pull requests.
 
 ## Inputs
 
@@ -15,9 +16,9 @@ This GitHub Action allows you to compile Pascal programs using the Free Pascal C
 
 ### fail-on
 
-The `fail-on` input can be used to control when the action should fail.
-By default, the action will fail only if an error occurs (or if the compiler crashes).
-If you want to be more strict with your code, you can use this option to have the action
+The `fail-on` input can be used to control when the Action should fail.
+By default, the Action will fail only if an error occurs (or if the compiler crashes).
+If you want to be more strict with your code, you can use this option to have the Action
 mark itself as "failed" when any warnings occur.
 
 With a C compiler, you could use the `-Werror` compiler option to have the compiler treat any
@@ -57,3 +58,39 @@ Implementation-wise, the flags passed to the Free Pascal compiler are `-v0 -viXX
 where `XXX` is the value for this input.
 As such, if you want to set the verbosity level through the `flags` input,
 you **need** to set this input to an empty string - this disables adding the two `-v` flags.
+
+## Getting FPC
+
+This Action assumes that FPC is already installed in your build environment; it does not handle
+installing it for you. You can do that yourself by adding one of the following steps
+to your GHActions workflow.
+
+### Ubuntu
+
+```
+- name: Install FPC
+  run: |
+     export DEBIAN_FRONTEND=noninteractive
+     sudo apt-get update
+     sudo apt-get install -y fpc
+```
+
+### MacOS
+
+```
+- name: Install FPC
+  run: |
+    brew update
+    brew install fpc
+```
+
+### MS Windows
+
+As of the time of writing, Chocolatey does not have a separate package for FPC,
+so you'll have to install Lazarus instead (it comes with a bundled copy of the compiler).
+
+```
+- name: Install Lazarus
+  run: |
+    choco install lazarus
+```

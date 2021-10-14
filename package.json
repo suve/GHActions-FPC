@@ -1,7 +1,7 @@
 {
 	"name": "GHActions-FPC",
 	"description": "GitHub action for running the Free Pascal Compiler",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"license": "Zlib",
 	"author": "suve",
 	"repository": "https://github.com/suve/GHActions-FPC",
