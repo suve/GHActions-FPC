@@ -4,14 +4,47 @@ import * as core from '@actions/core';
 
 
 function parserLineToAnnotationProps(line, workdir) {
+	const suffix = {
+		"fatal": "Fatal error",
+		"error": "Error",
+		"warning": "Warning",
+		"note": "Note",
+		"hint": "Hint",
+	};
+
 	let props = {
 		"file": workdir + line.file,
 		"startLine": line.line,
 	};
+
+	let title = `${line.file}(${line.line}`;
 	if(line.column > 0) {
 		props.startColumn = line.column;
+		title += `,${line.column}`
 	}
+
+	title += "): " + suffix[line.type];
+	props.title = title;
+
 	return props;
+}
+
+function emitSingleAnnotation(line, workdir) {
+	const props = parserLineToAnnotationProps(line, workdir);
+	switch(line.type) {
+		case "fatal":
+		case "error":
+			core.error(line.message, props);
+			break;
+
+		case "warning":
+			core.warning(line.message, props);
+			break;
+
+		case "note":
+		case "hint":
+			core.notice(line.message, props);
+	}
 }
 
 function emitAnnotations(parserData, workdir) {
@@ -21,24 +54,17 @@ function emitAnnotations(parserData, workdir) {
 		workdir = "";
 	}
 
-	// It would be more elegant to have an "emitSingleAnnotation()" function,
-	// but then we'd need to check parserLine.type each time to determine
-	// whether we should call core.error(), core.warning() or core.notice().
-	for(let i = 0; i < parserData.errors.length; ++i) {
-		const e = parserData.errors[i];
-		core.error(e.message, parserLineToAnnotationProps(e, workdir));
+	for(const e of parserData.errors) {
+		emitSingleAnnotation(e, workdir);
 	}
-	for(let i = 0; i < parserData.warnings.length; ++i) {
-		const w = parserData.warnings[i];
-		core.warning(w.message, parserLineToAnnotationProps(w, workdir));
+	for(const w of parserData.warnings) {
+		emitSingleAnnotation(w, workdir);
 	}
-	for(let i = 0; i < parserData.notes.length; ++i) {
-		const n = parserData.notes[i];
-		core.notice(n.message, parserLineToAnnotationProps(n, workdir));
+	for(const n of parserData.notes) {
+		emitSingleAnnotation(n, workdir);
 	}
-	for(let i = 0; i < parserData.hints.length; ++i) {
-		const h = parserData.hints[i];
-		core.notice(h.message, parserLineToAnnotationProps(h, workdir));
+	for(const h of parserData.hints) {
+		emitSingleAnnotation(h, workdir);
 	}
 }
 
