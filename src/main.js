@@ -74,11 +74,14 @@ function printStats(parserData) {
 
 function emitAnnotations(parserData) {
 	let parserLineToAnnotationProps = function(line) {
-		return {
+		let props = {
 			"file": line.file,
 			"startLine": line.line,
-			"startColumn": line.column,
 		};
+		if(line.column > 0) {
+			props.startColumn = line.column;
+		}
+		return props;
 	}
 
 	for(let i = 0; i < parserData.errors.length; ++i) {
