@@ -21,8 +21,11 @@ By default, the Action will fail only if an error occurs (or if the compiler cra
 If you want to be more strict with your code, you can use this option to have the Action
 mark itself as "failed" when any warnings occur.
 
-With a C compiler, you could use the `-Werror` compiler option to have the compiler treat any
-warnings as errors; however, FPC does not have an equivalent option.
+While FPC does have an option allowing for treating warnings as errors, `-Se` - and it even
+allows you to treat not only warnings, but also notes and hints as errors - it has one significant drawback:
+it enables "stop on first error" behaviour as well. Using `fail-on` with this Action allows you
+to retain the "keep compiling until a fatal error occurs" behaviour and diagnose more warnings
+during a single run of your CI workflow.
 
 The value for this input follows the same rules as the one for `verbosity`.
 Note that setting this input does **not** affect `verbosity` - if you use `ew` for `fail-on`,
@@ -95,3 +98,8 @@ so you'll have to install Lazarus instead (it comes with a bundled copy of the c
   run: |
     choco install lazarus
 ```
+
+### Licence
+
+This Action is made available under the terms of the zlib licence.
+For the full text of the licence, consult the `LICENCE` file.
