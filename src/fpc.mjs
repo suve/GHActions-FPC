@@ -104,7 +104,7 @@ async function getFpcVersion(fpc) {
 
 	let semver = semverValid(version.trim());
 	if(semver === null) {
-		throw new Error(`Failed to parse FPC version: "version"`);
+		throw new Error(`Failed to parse FPC version: "${version}"`);
 	}
 	return semver;
 }

@@ -56,22 +56,22 @@ function getExecOptions(parser) {
 }
 
 function printStats(parserData) {
-	const width = 6;
+	const width = 5;
 
-	const err = parserData.errors.length.toString().padStart(width);
-	const war = parserData.warnings.length.toString().padStart(width);
-	const not = parserData.notes.length.toString().padStart(width);
-	const hin = parserData.hints.length.toString().padStart(width);
+	const er = parserData.errors.length.toString().padStart(width);
+	const wa = parserData.warnings.length.toString().padStart(width);
+	const no = parserData.notes.length.toString().padStart(width);
+	const hi = parserData.hints.length.toString().padStart(width);
 
 	core.info(`
 -= GHActions-FPC =-
 
-| Message level | Number |
-| ------------- | ------ |
-| Error         | ${err} |
-| Warning       | ${war} |
-| Note          | ${not} |
-| Hint          | ${hin} |
+| Message level | Count |
+| ------------- | ----- |
+| Error         | ${er} |
+| Warning       | ${wa} |
+| Note          | ${no} |
+| Hint          | ${hi} |
 `);
 }
 
