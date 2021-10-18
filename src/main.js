@@ -17,17 +17,31 @@ function getExecFlags() {
 
 	const argVerbosity = core.getInput('verbosity');
 	if(argVerbosity.length > 0) {
-		for (let i = 0; i < argVerbosity.length; ++i) {
-			let char = argVerbosity.charAt(i);
-			if((char !== 'e') && (char !== 'w') && (char !== 'n') && (char !== 'h')) {
+		let vError = '';
+		let vWarning = '';
+		let vNote = '';
+		let vHint = '';
+		for(let char of argVerbosity) {
+			// FPC treats verbosity switches in a case-insensitive manner, so we should as well.
+			if((char === 'e') || (char === 'E')) {
+				vError = 'e';
+			} else if((char === 'w') || (char === 'W')) {
+				vWarning = 'w';
+			} else if((char === 'n') || (char === 'N')) {
+				vNote = 'n';
+			} else if((char === 'h') || (char === 'H')) {
+				vHint = 'h';
+			} else {
 				throw new Error(`Value for the "verbosity" input contains an illegal character: "${char}" (only 'e', 'w', 'n', 'h' are allowed)`);
 			}
 		}
-		// Push the -v0 flag first to set verbosity to minimum. This serves to "remove" any defaults set by fpc.cfg.
+		// Push the -v0 flag first to set verbosity to minimum. This serves to remove any defaults set by fpc.cfg.
 		// Next, push the desired verbosity level:
-		// - "i" (the "info" level) is added simply because of personal preference.
 		// - "b" (print full paths) is added to make sub-directory handling easier.
-		flags.push('-v0', '-vib' + argVerbosity)
+		// - "i" (the "info" level) is added because in the event of a compiler crash,
+		//   it makes it easy to pin-point which file was being compiled when the crash happened.
+		//   (This is not currently recognized by the Action itself, but could be helpful to a user reading the logs.)
+		flags.push('-v0', '-vib' + vError + vWarning + vNote + vHint)
 	}
 
 	const sourceFile = core.getInput('source');

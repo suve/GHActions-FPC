@@ -12,15 +12,15 @@ function getFailOn() {
 	};
 
 	const argFailOn = core.getInput('fail-on');
-	for (let i = 0; i < argFailOn.length; ++i) {
-		let char = argFailOn.charAt(i);
-		if(char === 'e') {
+	for(let char of argFailOn) {
+		// The "verbosity" input treats switches in a case-insensitive manner, so "fail-on" should do that as well.
+		if((char === 'e') || (char === 'E')) {
 			result.error = true;
-		} else if(char === 'w') {
+		} else if((char === 'w') || (char === 'W')) {
 			result.warning = true;
-		} else if(char === 'n') {
+		} else if((char === 'n') || (char === 'N')) {
 			result.note = true;
-		} else if(char === 'h') {
+		} else if((char === 'h') || (char === 'H')) {
 			result.hint = true;
 		} else {
 			throw new Error(`Value for the "fail-on" input contains an illegal character: "${char}" (only 'e', 'w', 'n', 'h' are allowed)`);
