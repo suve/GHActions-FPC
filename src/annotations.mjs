@@ -27,6 +27,9 @@ function parserLineToAnnotationProps(line, fileDetails) {
 	if(line.column > 0) {
 		props.startColumn = line.column;
 		title += `,${line.column}`
+	} else {
+		// GitHub requires the "startColumn" field to be present.
+		props.startColumn = 1;
 	}
 
 	title += "): " + suffix[line.type];
