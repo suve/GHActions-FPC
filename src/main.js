@@ -119,7 +119,7 @@ async function main() {
 		let exitCode = await exec.exec(inputs.fpc, getExecFlags(), getExecOptions(parser));
 
 		printStats(parser.getData());
-		emitAnnotations(parser.getData());
+		await emitAnnotations(parser.getData());
 
 		checkFail(exitCode, inputs, parser.getData());
 	} catch (e) {
