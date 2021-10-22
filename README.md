@@ -48,13 +48,13 @@ When omitted, the Action behaves as follows:
 ### verbosity
 
 The `verbosity` input can be used to control the desired verbosity level.
-The value can be any combination of the following letters:
+The value can be any combination of the following (case-insensitive) letters:
 - `e` for errors
 - `w` for warnings
 - `n` for notes
 - `h` for hints
 
-Note that these are "precise", i.e. a value of `n` will result in just the notes being printed,
+Note that these are exclusive, i.e. a value of `n` will result in just the notes being printed,
 without errors or warnings. You need `ewn` (or `new`, the order doesn't matter) if you want all three.
 
 Implementation-wise, the flags passed to the Free Pascal compiler are `-v0 -vibXXX`,

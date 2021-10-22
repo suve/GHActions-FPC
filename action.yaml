@@ -1,6 +1,9 @@
 name: 'Free Pascal Compiler'
 description: 'Compile Pascal code using FPC'
 author: 'suve'
+branding:
+  icon: 'play'
+  color: 'blue'
 inputs:
   fail-on:
     description: 'Strictness level'
