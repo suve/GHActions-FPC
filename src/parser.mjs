@@ -26,6 +26,14 @@ function Parser() {
 		const type = check[4].toLowerCase();
 		const message = check[5];
 
+		// Ignore the "fatal error because errors occurred" message
+		if(type === "fatal") {
+			const thereWereErrorsRegexp = /^There (was|were) \d+ errors? compiling module, stopping$/;
+			if(thereWereErrorsRegexp.test(message)) {
+				return false;
+			}
+		}
+
 		const diagObj = {
 			"path": path,
 			"line": line,
