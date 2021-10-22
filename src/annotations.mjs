@@ -51,17 +51,10 @@ function emitSingleAnnotation(line) {
 }
 
 function emitAnnotations(parserData) {
-	for(const e of parserData.errors) {
-		emitSingleAnnotation(e);
-	}
-	for(const w of parserData.warnings) {
-		emitSingleAnnotation(w);
-	}
-	for(const n of parserData.notes) {
-		emitSingleAnnotation(n);
-	}
-	for(const h of parserData.hints) {
-		emitSingleAnnotation(h);
+	for(const list of parserData.byType) {
+		for(const line of list) {
+			emitSingleAnnotation(line);
+		}
 	}
 }
 

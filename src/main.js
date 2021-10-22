@@ -72,10 +72,10 @@ function getExecOptions(parser) {
 function printStats(parserData) {
 	const width = 5;
 
-	const er = parserData.errors.length.toString().padStart(width);
-	const wa = parserData.warnings.length.toString().padStart(width);
-	const no = parserData.notes.length.toString().padStart(width);
-	const hi = parserData.hints.length.toString().padStart(width);
+	const er = parserData.byType.error.length.toString().padStart(width);
+	const wa = parserData.byType.warning.length.toString().padStart(width);
+	const no = parserData.byType.note.length.toString().padStart(width);
+	const hi = parserData.byType.hint.length.toString().padStart(width);
 
 	core.info(`
 -= GHActions-FPC =-
@@ -90,18 +90,19 @@ function printStats(parserData) {
 }
 
 function checkFail(exitCode, inputs, parserData) {
-	if((inputs.failOn.error) && (parserData.errors.length > 0)) {
-		throw new Error(`${parserData.errors.length} errors were emitted`)
+	for(let type of ['error', 'warning', 'note', 'hint']) {
+		if(!inputs.failOn[type]) continue;
+
+		const count = parserData.byType[type].length;
+		if(count < 1) continue;
+
+		let message = (count > 1) ? `${count} ${type}s were emitted` : `1 ${type} was emitted`;
+		if(type !== 'error') {
+			message += ` and fail-on-${type} is enabled`;
+		}
+		throw new Error(message);
 	}
-	if((inputs.failOn.warning) && (parserData.warnings.length > 0)) {
-		throw new Error(`${parserData.warnings.length} warnings were emitted and fail-on-warning is enabled`)
-	}
-	if((inputs.failOn.note) && (parserData.notes.length > 0)) {
-		throw new Error(`${parserData.notes.length} notes were emitted and fail-on-note is enabled`)
-	}
-	if((inputs.failOn.hint) && (parserData.hints.length > 0)) {
-		throw new Error(`${parserData.hints.length} hints were emitted and fail-on-hint is enabled`)
-	}
+
 	if(exitCode !== 0) {
 		throw new Error(`FPC exited with code ${exitCode}`)
 	}
@@ -115,9 +116,7 @@ async function main() {
 		await checkFpcVersion(inputs.fpc, MIN_VERSION);
 
 		let parser = new Parser();
-		let flags = getExecFlags();
-		let options = getExecOptions(parser);
-		let exitCode = await exec.exec(inputs.fpc, flags, options);
+		let exitCode = await exec.exec(inputs.fpc, getExecFlags(), getExecOptions(parser));
 
 		printStats(parser.getData());
 		emitAnnotations(parser.getData());

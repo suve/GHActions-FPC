@@ -1,9 +1,12 @@
 function Parser() {
 	this._data = {
-		"errors": [],
-		"warnings": [],
-		"notes": [],
-		"hints": [],
+		"byType": {
+			"error": [],
+			"warning": [],
+			"note": [],
+			"hint": [],
+		},
+		"byFile": {},
 	};
 
 	this.getData = function() {
@@ -31,16 +34,17 @@ function Parser() {
 			"message": message,
 		}
 		if((type === "error") || (type === "fatal")) {
-			this._data.errors.push(diagObj);
-		} else if(type === "warning") {
-			this._data.warnings.push(diagObj);
-		} else if(type === "note") {
-			this._data.notes.push(diagObj);
-		} else if(type === "hint") {
-			this._data.hints.push(diagObj);
+			this._data.byType.error.push(diagObj);
 		} else {
-			// Unknown type. Throw an exception? Print something to stderr?
+			this._data.byType[type].push(diagObj);
 		}
+
+		if(this._data.byFile.hasOwnProperty(path)) {
+			this._data.byFile[path].push(diagObj);
+		} else {
+			this._data.byFile[path] = [diagObj];
+		}
+
 		return true;
 	}
 }
