@@ -93,9 +93,12 @@ async function emitAnnotations(parserData) {
 			"path": path.relative("", file),
 			"lineCount": await countLinesInFile(file),
 		};
+
+		core.startGroup(fileDetails.path);
 		for(const msg of parserData.byFile[file]) {
-			emitSingleAnnotation(msg, fileDetails)
+			emitSingleAnnotation(msg, fileDetails);
 		}
+		core.endGroup();
 	}
 }
 
