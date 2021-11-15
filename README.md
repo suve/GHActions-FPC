@@ -5,14 +5,29 @@ It will parse the compiler's diagnostics and create annotations on your commits 
 
 ## Inputs
 
-| Name        | Required | Description            | Default     |
-| ----------- | :------: | ---------------------- | ----------- |
-| `fail-on`   |          | Strictness level.      | `e`         |
-| `fpc`       |          | FPC executable to use. | _see below_ |
-| `flags`     |          | Flags passed to FPC.   |             |
-| `source`    | Yes      | Main source file.      |             |
-| `verbosity` |          | Verbosity level.       | `ew`        |
-| `workdir`   |          | Working directory.     |             |
+| Name           | Required | Description               | Default     |
+| -------------- | :------: | ------------------------- | ----------- |
+| `exclude-path` |          | List of paths to exclude. |             |
+| `fail-on`      |          | Strictness level.         | `e`         |
+| `fpc`          |          | FPC executable to use.    | _see below_ |
+| `flags`        |          | Flags passed to FPC.      |             |
+| `source`       | Yes      | Main source file.         |             |
+| `verbosity`    |          | Verbosity level.          | `ew`        |
+| `workdir`      |          | Working directory.        |             |
+
+### exclude-path
+
+The `exclude-path` input can be used to ignore compiler messages pertaining to some files.
+This is useful if you bundle some third-party libraries (or library headers) with your code
+and want to exclude those files from generating annotations.
+
+The value for this input is a list of paths, separated by a comma (`:`) on Linux and MacOS,
+and by a semicolon (`;`) on MS Windows. Paths can be either absolute or relative.
+Relative paths are resolved against the repository root, regardless of the `workdir` input.
+
+If an entry ends with a slash (or backslash, on MS Windows) it is treated as a directory,
+in which case all files in said directory (and its subdirectories) are ignored.
+Otherwise, the entry is treated as a file name and a strict match is required.
 
 ### fail-on
 
@@ -37,7 +52,7 @@ The `fpc` input can be used to provide a full path to the Free Pascal Compiler e
 When omitted, the Action behaves as follows:
 - On Linux/MacOS: use `fpc`, i.e. rely on the executable being somewhere in `$PATH`.
 - On Windows: the following list of directories is checked in search of an existing FPC installation.
-  `X.Y.Z` stands for the version number of fpc. If multiple versions are found, the latest is preferred.
+  `X.Y.Z` stands for the version number of FPC. If multiple versions are found, the latest is preferred.
   * `C:\fpc\X.Y.Z`
   * `C:\Program Files\fpc\X.Y.Z`
   * `C:\Program Files (x86)\fpc\X.Y.Z`

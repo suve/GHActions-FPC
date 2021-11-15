@@ -1,4 +1,17 @@
-function Parser() {
+import { sep as PATH_SEPARATOR } from 'path';
+
+
+function Parser(excludePath) {
+	this._excludeDirs = [];
+	this._excludeFiles = [];
+	for(let ex of excludePath) {
+		if(ex.endsWith(PATH_SEPARATOR)) {
+			this._excludeDirs.push(ex);
+		} else {
+			this._excludeFiles.push(ex);
+		}
+	}
+
 	this._data = {
 		"byType": {
 			"error": [],
@@ -25,6 +38,18 @@ function Parser() {
 		const column = (check[3] !== undefined) ? Number(check[3]) : null;
 		const type = check[4].toLowerCase();
 		const message = check[5];
+
+		// Ignore any messages pertaining to excluded files
+		for(let excluded of this._excludeDirs) {
+			if(path.startsWith(excluded)) {
+				return false;
+			}
+		}
+		for(let excluded of this._excludeFiles) {
+			if(path === excluded) {
+				return false;
+			}
+		}
 
 		// Ignore the "fatal error because errors occurred" message
 		if(type === "fatal") {

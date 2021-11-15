@@ -5,6 +5,10 @@ branding:
   icon: 'play'
   color: 'blue'
 inputs:
+  exclude-path:
+    description: 'List of paths to ignore'
+    required: false
+    default: ''
   fail-on:
     description: 'Strictness level'
     required: false

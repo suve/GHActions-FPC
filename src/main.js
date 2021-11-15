@@ -115,7 +115,7 @@ async function main() {
 		let inputs = getInputs();
 		await checkFpcVersion(inputs.fpc, MIN_VERSION);
 
-		let parser = new Parser();
+		let parser = new Parser(inputs.excludePath);
 		let exitCode = await exec.exec(inputs.fpc, getExecFlags(), getExecOptions(parser));
 
 		printStats(parser.getData());

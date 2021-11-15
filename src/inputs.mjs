@@ -1,7 +1,29 @@
+import * as path from 'path';
+import * as process from 'process';
+
 import * as core from '@actions/core';
 
 import { findFpc } from './fpc.mjs';
 
+
+function getExcludePath() {
+	let exclude = core.getInput('exclude-path');
+	if(exclude === '') return [];
+
+	const cwd = process.cwd();
+	function resolvePath(p) {
+		if(!path.isAbsolute(p)) {
+			p = cwd + path.sep + p;
+		}
+		return path.normalize(p);
+	}
+
+	return exclude
+		.split(path.delimiter)
+		.filter(entry => entry.length !== 0)
+		.map(entry => resolvePath(entry))
+	;
+}
 
 function getFailOn() {
 	let result = {
@@ -41,6 +63,7 @@ function getFpc() {
 
 function getInputs() {
 	return {
+		"excludePath": getExcludePath(),
 		"failOn": getFailOn(),
 		"fpc": getFpc(),
 	};
