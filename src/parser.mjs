@@ -1,11 +1,11 @@
-import { sep as PATH_SEPARATOR } from 'path';
+import * as path from 'path';
 
 
 function Parser(excludePath) {
 	this._excludeDirs = [];
 	this._excludeFiles = [];
 	for(let ex of excludePath) {
-		if(ex.endsWith(PATH_SEPARATOR)) {
+		if(ex.endsWith(path.sep)) {
 			this._excludeDirs.push(ex);
 		} else {
 			this._excludeFiles.push(ex);
@@ -33,7 +33,7 @@ function Parser(excludePath) {
 		const check = diagnosticRegexp.exec(text);
 		if(check === null) return false;
 
-		const path = check[1];
+		const filePath = path.normalize(check[1]);
 		const line = Number(check[2]);
 		const column = (check[3] !== undefined) ? Number(check[3]) : null;
 		const type = check[4].toLowerCase();
@@ -41,12 +41,12 @@ function Parser(excludePath) {
 
 		// Ignore any messages pertaining to excluded files
 		for(let excluded of this._excludeDirs) {
-			if(path.startsWith(excluded)) {
+			if(filePath.startsWith(excluded)) {
 				return false;
 			}
 		}
 		for(let excluded of this._excludeFiles) {
-			if(path === excluded) {
+			if(filePath === excluded) {
 				return false;
 			}
 		}
@@ -60,7 +60,7 @@ function Parser(excludePath) {
 		}
 
 		const diagObj = {
-			"path": path,
+			"path": filePath,
 			"line": line,
 			"column": column,
 			"type": type,
@@ -72,10 +72,10 @@ function Parser(excludePath) {
 			this._data.byType[type].push(diagObj);
 		}
 
-		if(this._data.byFile.hasOwnProperty(path)) {
-			this._data.byFile[path].push(diagObj);
+		if(this._data.byFile.hasOwnProperty(filePath)) {
+			this._data.byFile[filePath].push(diagObj);
 		} else {
-			this._data.byFile[path] = [diagObj];
+			this._data.byFile[filePath] = [diagObj];
 		}
 
 		return true;
