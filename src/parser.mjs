@@ -2,17 +2,17 @@ import * as path from 'path';
 
 
 function Parser(excludePath) {
-	this._excludeDirs = [];
-	this._excludeFiles = [];
+	let excludeDirs = [];
+	let excludeFiles = [];
 	for(let ex of excludePath) {
 		if(ex.endsWith(path.sep)) {
-			this._excludeDirs.push(ex);
+			excludeDirs.push(ex);
 		} else {
-			this._excludeFiles.push(ex);
+			excludeFiles.push(ex);
 		}
 	}
 
-	this._data = {
+	let diagnostics = {
 		"byType": {
 			"error": [],
 			"warning": [],
@@ -21,10 +21,11 @@ function Parser(excludePath) {
 		},
 		"byFile": {},
 	};
+	let previous = null;
 
 	this.getData = function() {
-		return this._data;
-	}
+		return diagnostics;
+	};
 
 	this.parseLine = function(text) {
 		text = text.trim();
@@ -39,13 +40,37 @@ function Parser(excludePath) {
 		const type = check[4].toLowerCase();
 		const message = check[5];
 
+		/*
+		 * When a function is called with the wrong number of parameters, the compiler emits multiple messages:
+		 *   /example/main.pas(9,41) Error: Wrong number of parameters specified for call to "SomeFunc"
+		 *   /example/impl.pas(3,10) Error: Found declaration: SomeFunc(SmallInt):SmallInt;
+		 * If these two messages are treated separately, they'll generate a rather non-useful annotation,
+		 * attached to an error-free line, possibly in a different file. Instead, try to detect the second message type
+		 * and attach the "declaration found" information to the initial "wrong number of parameters" message.
+		 */
+		const foundDeclarationString = "Found declaration: ";
+		if(message.startsWith(foundDeclarationString)) {
+			if(previous !== null) {
+				// The workdir for the Action is the repo root, so a path relative to cwd will be relative to repo root.
+				// If this produces a path starting with "../", then it's a file outside the repo - in which case, refer to it using the full path.
+				let repoPath = path.relative("", filePath);
+				if(repoPath.startsWith(`..${path.sep}`)) {
+					repoPath = filePath;
+				}
+
+				let declaration = message.substring(foundDeclarationString.length);
+				previous.message += `\nFound declaration in ${repoPath}(${line},${column}): ${declaration}`
+			}
+			return false;
+		}
+
 		// Ignore any messages pertaining to excluded files
-		for(let excluded of this._excludeDirs) {
+		for(let excluded of excludeDirs) {
 			if(filePath.startsWith(excluded)) {
 				return false;
 			}
 		}
-		for(let excluded of this._excludeFiles) {
+		for(let excluded of excludeFiles) {
 			if(filePath === excluded) {
 				return false;
 			}
@@ -67,19 +92,20 @@ function Parser(excludePath) {
 			"message": message,
 		}
 		if((type === "error") || (type === "fatal")) {
-			this._data.byType.error.push(diagObj);
+			diagnostics.byType.error.push(diagObj);
 		} else {
-			this._data.byType[type].push(diagObj);
+			diagnostics.byType[type].push(diagObj);
 		}
 
-		if(this._data.byFile.hasOwnProperty(filePath)) {
-			this._data.byFile[filePath].push(diagObj);
+		if(diagnostics.byFile.hasOwnProperty(filePath)) {
+			diagnostics.byFile[filePath].push(diagObj);
 		} else {
-			this._data.byFile[filePath] = [diagObj];
+			diagnostics.byFile[filePath] = [diagObj];
 		}
 
+		previous = diagObj;
 		return true;
-	}
+	};
 }
 
 export {
