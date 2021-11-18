@@ -33,9 +33,18 @@ function getFlags() {
 	const flags = core.getInput('flags');
 	if(flags === '') return [];
 
+	const addLeadingDash = function(value) {
+		if(value.charAt(0) !== '-') {
+			return '-' + value;
+		} else {
+			return value;
+		}
+	};
+
 	return flags
 		.split(' ')
 		.filter(elem => elem !== '')
+		.map(addLeadingDash)
 	;
 }
 

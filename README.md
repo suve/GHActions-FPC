@@ -60,6 +60,11 @@ When omitted, the Action behaves as follows:
   * `C:\Program Files\lazarus\fpc\X.Y.Z`
   * `C:\Program Files (x86)\lazarus\fpc\X.Y.Z`
 
+### flags
+
+The `flags` input can be used to pass custom flags (i.e. options) to FPC. The passed string is interpreted
+as a list of space-separated values. The leading dash on each flag can be omitted.
+
 ### verbosity
 
 The `verbosity` input can be used to control the desired verbosity level.
@@ -114,7 +119,7 @@ so you'll have to install Lazarus instead (it comes with a bundled copy of the c
     choco install lazarus
 ```
 
-### Licence
+## Licence
 
 This Action is made available under the terms of the zlib licence.
 For the full text of the licence, consult the `LICENCE` file.
