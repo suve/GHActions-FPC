@@ -20,12 +20,53 @@ function getExcludePath() {
 
 	return exclude
 		.split(path.delimiter)
-		.filter(entry => entry.length !== 0)
+		.filter(entry => entry !== '')
 		.map(entry => resolvePath(entry))
 	;
 }
 
 function getFailOn() {
+	return parseVerbosityFlags("fail-on");
+}
+
+function getFlags() {
+	const flags = core.getInput('flags');
+	if(flags === '') return [];
+
+	return flags
+		.split(' ')
+		.filter(elem => elem !== '')
+	;
+}
+
+function getFpc() {
+	const fpc = core.getInput('fpc');
+	if(fpc !== '') return fpc;
+
+	return findFpc();
+}
+
+function getSource() {
+	return core.getInput("source");
+}
+
+function getVerbosity() {
+	const enabled = parseVerbosityFlags("verbosity");
+
+	let flags = '';
+	if(enabled.error) flags += 'e';
+	if(enabled.warning) flags += 'w';
+	if(enabled.note) flags += 'n';
+	if(enabled.hint) flags += 'h';
+
+	return flags;
+}
+
+function getWorkdir() {
+	return core.getInput("workdir");
+}
+
+function parseVerbosityFlags(name) {
 	let result = {
 		"error": false,
 		"warning": false,
@@ -33,9 +74,9 @@ function getFailOn() {
 		"hint": false,
 	};
 
-	const argFailOn = core.getInput('fail-on');
-	for(let char of argFailOn) {
-		// The "verbosity" input treats switches in a case-insensitive manner, so "fail-on" should do that as well.
+	const value = core.getInput(name);
+	for(const char of value) {
+		// FPC treats verbosity switches in a case-insensitive manner, so let's do that as well.
 		if((char === 'e') || (char === 'E')) {
 			result.error = true;
 		} else if((char === 'w') || (char === 'W')) {
@@ -45,27 +86,22 @@ function getFailOn() {
 		} else if((char === 'h') || (char === 'H')) {
 			result.hint = true;
 		} else {
-			throw new Error(`Value for the "fail-on" input contains an illegal character: "${char}" (only 'e', 'w', 'n', 'h' are allowed)`);
+			throw new Error(`Value for the "${name}" input contains an illegal character: "${char}" (only 'e', 'w', 'n', 'h' are allowed)`);
 		}
 	}
 
 	return result;
 }
 
-function getFpc() {
-	let fpc = core.getInput('fpc');
-	if(fpc === '') {
-		fpc = findFpc();
-	}
-
-	return fpc;
-}
-
 function getInputs() {
 	return {
 		"excludePath": getExcludePath(),
 		"failOn": getFailOn(),
+		"flags": getFlags(),
 		"fpc": getFpc(),
+		"source": getSource(),
+		"verbosity": getVerbosity(),
+		"workdir": getWorkdir(),
 	};
 }
 
