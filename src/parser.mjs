@@ -4,7 +4,7 @@ function Diagnostic(matches) {
 	this.path = path.normalize(matches[1]);
 	this.line = Number(matches[2]);
 	this.column = (matches[3] !== undefined) ? Number(matches[3]) : null;
-	this.type =  matches[4].toLowerCase();
+	this.type = matches[4].toLowerCase();
 	this.message = matches[5];
 }
 
@@ -29,7 +29,7 @@ function Parser(excludePath) {
 			}
 			return false;
 		};
-	})();
+	}());
 
 	/*
 	 * When a function is called with the wrong number of parameters, the compiler emits multiple messages:
@@ -65,6 +65,10 @@ function Parser(excludePath) {
 		return thereWereErrorsRegexp.test(diag.message);
 	};
 
+	const isErrorDiagnostic = function(diag) {
+		return (diag.type === "error") || (diag.type === "fatal");
+	};
+
 	let diagnostics = {
 		"byType": {
 			"error": [],
@@ -93,8 +97,8 @@ function Parser(excludePath) {
 		if(isFoundDeclarationDiagnostic(diag)) return false;
 		// Ignore the "fatal error because errors occurred" message
 		if(isStoppingDiagnostic(diag)) return false;
-		// Ignore any messages pertaining to excluded files
-		if(fileIsExcluded(diag)) return false;
+		// Ignore any messages pertaining to excluded files (unless they're errors, as those will cause a compilation failure)
+		if(fileIsExcluded(diag) && !isErrorDiagnostic(diag)) return false;
 
 		// "Fatal error" messages go in the same bucket as regular errors
 		const type = (diag.type === "fatal") ? "error" : diag.type;
