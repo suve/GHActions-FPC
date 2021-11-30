@@ -9,8 +9,8 @@ It will parse the compiler's diagnostics and create annotations on your commits 
 | -------------- | :------: | ------------------------- | ----------- |
 | `exclude-path` |          | List of paths to exclude. |             |
 | `fail-on`      |          | Strictness level.         | `e`         |
-| `fpc`          |          | FPC executable to use.    | _see below_ |
 | `flags`        |          | Flags passed to FPC.      |             |
+| `fpc`          |          | FPC executable to use.    | _see below_ |
 | `source`       | Yes      | Main source file.         |             |
 | `verbosity`    |          | Verbosity level.          | `ew`        |
 | `workdir`      |          | Working directory.        |             |
@@ -46,6 +46,11 @@ The value for this input follows the same rules as the one for `verbosity`.
 Note that setting this input does **not** affect `verbosity` - if you use `ew` for `fail-on`,
 you **must** have `ew` in your verbosity settings.
 
+### flags
+
+The `flags` input can be used to pass custom flags (i.e. options) to FPC. The passed string is interpreted
+as a list of space-separated values. The leading dash on each flag can be omitted.
+
 ### fpc
 
 The `fpc` input can be used to provide a full path to the Free Pascal Compiler executable.
@@ -59,11 +64,6 @@ When omitted, the Action behaves as follows:
   * `C:\lazarus\fpc\X.Y.Z`
   * `C:\Program Files\lazarus\fpc\X.Y.Z`
   * `C:\Program Files (x86)\lazarus\fpc\X.Y.Z`
-
-### flags
-
-The `flags` input can be used to pass custom flags (i.e. options) to FPC. The passed string is interpreted
-as a list of space-separated values. The leading dash on each flag can be omitted.
 
 ### verbosity
 

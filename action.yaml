@@ -2,7 +2,7 @@ name: 'Free Pascal Compiler'
 description: 'Compile Pascal code using FPC'
 author: 'suve'
 branding:
-  icon: 'play'
+  icon: 'code'
   color: 'blue'
 inputs:
   exclude-path:
@@ -13,12 +13,12 @@ inputs:
     description: 'Strictness level'
     required: false
     default: 'e'
-  fpc:
-    description: 'Full path to fpc executable'
-    required: false
-    default: ''
   flags:
     description: 'FPC flags (space-separated)'
+    required: false
+    default: ''
+  fpc:
+    description: 'Full path to fpc executable'
     required: false
     default: ''
   source:
