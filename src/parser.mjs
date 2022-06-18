@@ -6,6 +6,7 @@ function Diagnostic(matches) {
 	this.column = (matches[3] !== undefined) ? Number(matches[3]) : null;
 	this.type = matches[4].toLowerCase();
 	this.message = matches[5];
+	this.userDefined = this.message.startsWith("User defined:")
 }
 
 function Parser(excludePath) {

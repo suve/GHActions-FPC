@@ -43,23 +43,32 @@ function getExecOptions(inputs, parser) {
 }
 
 function printStats(parserData) {
-	const width = 5;
-
-	const er = parserData.byType.error.length.toString().padStart(width);
-	const wa = parserData.byType.warning.length.toString().padStart(width);
-	const no = parserData.byType.note.length.toString().padStart(width);
-	const hi = parserData.byType.hint.length.toString().padStart(width);
-
-	core.info(`
+	let message = `
 -= GHActions-FPC =-
 
-| Message level | Count |
-| ------------- | ----- |
-| Error         | ${er} |
-| Warning       | ${wa} |
-| Note          | ${no} |
-| Hint          | ${hi} |
-`);
+| Message level | Compiler | User |
+| ------------- | -------- | ---- |
+`;
+
+	for(let type of ['Error', 'Warning', 'Note', 'Hint']) {
+		let name = type.padEnd(13);
+		let type = type.toLowerCase();
+
+		let compiler = 0;
+		let user = 0;
+		for(let msg of parserData.byType[type]) {
+			if(!msg.userDefined)
+				compiler += 1;
+			else
+				user += 1;
+		}
+
+		compiler = compiler.toString().padStart(8);
+		user = user.toString().padStart(5);
+		message += `| ${name} | ${compiler} | ${user} |` + "\n";
+	}
+
+	core.info(message);
 }
 
 function checkFail(exitCode, inputs, parserData) {
