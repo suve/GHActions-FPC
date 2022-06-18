@@ -59,6 +59,22 @@ function getSource() {
 	return core.getInput("source");
 }
 
+function getUserDefined() {
+	const value = core.getInput("user-defined").trim().toLowerCase();
+	switch(value) {
+		case "1":
+		case "true":
+			return true;
+
+		case "0":
+		case "false":
+			return false;
+
+		default:
+			throw new Error(`Value for the "user-defined" input must be either "true" or "false" (got "${value}")`);
+	}
+}
+
 function getVerbosity() {
 	const enabled = parseVerbosityFlags("verbosity");
 
@@ -109,6 +125,7 @@ function getInputs() {
 		"flags": getFlags(),
 		"fpc": getFpc(),
 		"source": getSource(),
+		"userDefined": getUserDefined(),
 		"verbosity": getVerbosity(),
 		"workdir": getWorkdir(),
 	};

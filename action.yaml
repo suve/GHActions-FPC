@@ -24,6 +24,10 @@ inputs:
   source:
     description: 'Main source file to compile'
     required: true
+  user-defined:
+    description: 'Display user-defined messages'
+    required: false
+    default: 'true'
   verbosity:
     description: 'Verbosity level'
     required: false

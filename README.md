@@ -5,15 +5,16 @@ It will parse the compiler's diagnostics and create annotations on your commits 
 
 ## Inputs
 
-| Name           | Required | Description               | Default     |
-| -------------- | :------: | ------------------------- | ----------- |
-| `exclude-path` |          | List of paths to exclude. |             |
-| `fail-on`      |          | Strictness level.         | `e`         |
-| `flags`        |          | Flags passed to FPC.      |             |
-| `fpc`          |          | FPC executable to use.    | _see below_ |
-| `source`       | Yes      | Main source file.         |             |
-| `verbosity`    |          | Verbosity level.          | `ew`        |
-| `workdir`      |          | Working directory.        |             |
+| Name           | Required | Description                 | Default     |
+| -------------- | :------: | --------------------------- | ----------- |
+| `exclude-path` |          | List of paths to exclude.   |             |
+| `fail-on`      |          | Strictness level.           | `e`         |
+| `flags`        |          | Flags passed to FPC.        |             |
+| `fpc`          |          | FPC executable to use.      | _see below_ |
+| `source`       | Yes      | Main source file.           |             |
+| `user-defined` |          | Show user-defined messages. | `true`      |
+| `verbosity`    |          | Verbosity level.            | `ew`        |
+| `workdir`      |          | Working directory.          |             |
 
 ### exclude-path
 
@@ -64,6 +65,16 @@ When omitted, the Action behaves as follows:
   * `C:\lazarus\fpc\X.Y.Z`
   * `C:\Program Files\lazarus\fpc\X.Y.Z`
   * `C:\Program Files (x86)\lazarus\fpc\X.Y.Z`
+
+### user-defined
+
+The `user-defined` input can be used to control whether user-defined messages
+(i.e. those produced using `{$FATAL}`, `${ERROR}`, `{$WARNING}`, `{$NOTE}` and `{$HINT}`
+compiler directives) should be shown.
+
+Note that, when a user-defined message causes the Action to fail (e.g. a `${FATAL}` directive is met,
+or fail-on-warning is enabled and a `${WARNING}` directive is met), it **will** be shown,
+even if this input was set to `false`.
 
 ### verbosity
 
