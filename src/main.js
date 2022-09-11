@@ -57,9 +57,9 @@ function printStats(parserData) {
 | ------------- | -------- | ---- |
 `;
 
-	for(let type of ['Error', 'Warning', 'Note', 'Hint']) {
-		let name = type.padEnd(13);
-		let type = type.toLowerCase();
+	for(let msgType of ['Error', 'Warning', 'Note', 'Hint']) {
+		const name = msgType.padEnd(13);
+		const type = msgType.toLowerCase();
 
 		let compiler = 0;
 		let user = 0;
@@ -71,7 +71,7 @@ function printStats(parserData) {
 		}
 
 		compiler = compiler.toString().padStart(8);
-		user = user.toString().padStart(5);
+		user = user.toString().padStart(4);
 		message += `| ${name} | ${compiler} | ${user} |` + "\n";
 	}
 
