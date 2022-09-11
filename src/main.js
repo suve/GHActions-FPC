@@ -1,3 +1,5 @@
+import * as process from 'process';
+
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 
@@ -34,10 +36,15 @@ function getExecOptions(inputs, parser) {
 	}
 
 	options.listeners = {
-		"stdline": function(line) {
-			parser.parseLine(line);
-		}
+		"stdline": parser.parseLine,
 	};
+
+	// On MS Windows, FPC uses its own, internal linker, which generates nice error messages.
+	// On other platforms, it calls an external linker (typically /usr/bin/ld).
+	// The external linker will print messages to stderr. Try to parse those to detect linker errors.
+	if(process.platform !== "win32") {
+		options.listeners.errline = parser.parseErr;
+	}
 
 	return options;
 }

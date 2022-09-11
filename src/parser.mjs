@@ -1,4 +1,5 @@
 import * as path from 'path';
+import * as process from 'process';
 
 function Diagnostic(matches) {
 	this.path = path.normalize(matches[1]);
@@ -70,6 +71,11 @@ function Parser(excludePath) {
 		return (diag.type === "error") || (diag.type === "fatal");
 	};
 
+	// -- end private functions, start consts and variables
+
+	const diagnosticRegexp = /^(.+)\((\d+),?(\d+)?\) (Fatal|Error|Warning|Note|Hint): (.+)$/;
+	const linkingErrorRegexp = /^(\/.+): cannot find -l(.+)$/;
+
 	let diagnostics = {
 		"byType": {
 			"error": [],
@@ -81,6 +87,10 @@ function Parser(excludePath) {
 	};
 	let previous = null;
 
+	let linkerErrors = [];
+
+	// -- end private stuff, start public functions
+
 	this.getData = function() {
 		return diagnostics;
 	};
@@ -88,9 +98,10 @@ function Parser(excludePath) {
 	this.parseLine = function(text) {
 		text = text.trim();
 
-		const diagnosticRegexp = /^(.+)\((\d+),?(\d+)?\) (Fatal|Error|Warning|Note|Hint): (.+)$/;
 		const check = diagnosticRegexp.exec(text);
-		if(check === null) return false;
+		if(check === null) {
+			return false;
+		}
 
 		const diag = new Diagnostic(check);
 
@@ -100,6 +111,13 @@ function Parser(excludePath) {
 		if(isStoppingDiagnostic(diag)) return false;
 		// Ignore any messages pertaining to excluded files (unless they're errors, as those will cause a compilation failure)
 		if(fileIsExcluded(diag) && !isErrorDiagnostic(diag)) return false;
+
+		// If this is the "error while linking" message, attach any detected linker errors to it.
+		// Not applicable on MS Windows, since FPC uses its own internal linker there.
+		if((diag.type === "error") && (diag.message === "Error while linking") && (process.platform !== "win32")) {
+			if(linkerErrors.length > 0) diag.message += ": " + linkerErrors.join(", ");
+			linkerErrors = [];
+		}
 
 		// "Fatal error" messages go in the same bucket as regular errors
 		const type = (diag.type === "fatal") ? "error" : diag.type;
@@ -112,6 +130,16 @@ function Parser(excludePath) {
 		}
 
 		previous = diag;
+		return true;
+	};
+
+	this.parseErr = function(text) {
+		const matches = linkingErrorRegexp.exec(text.trim());
+		if(matches === null) {
+			return false;
+		}
+
+		linkerErrors.push("cannot find -l" + matches[2]);
 		return true;
 	};
 }
