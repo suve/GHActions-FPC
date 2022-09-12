@@ -97,6 +97,29 @@ function checkFail(exitCode, inputs, parserData) {
 	}
 }
 
+function filterData(inputs, data) {
+	// No other filtering done currently
+	if(inputs.userDefined) return data;
+
+	const filterFunc = function(message) {
+		if(!message.userDefined) return true;
+		return inputs.failOn[message.type];
+	}
+
+	for(let type in data.byType) {
+		data.byType[type] = data.byType[type].filter(filterFunc);
+	}
+
+	for(let file in data.byFile) {
+		data.byFile[file] = data.byFile[file].filter(filterFunc);
+		if(data.byFile[file].length === 0) {
+			delete data.byFile[file];
+		}
+	}
+
+	return data;
+}
+
 async function main() {
 	const MIN_VERSION = '2.1.2';
 
@@ -111,10 +134,13 @@ async function main() {
 			getExecOptions(inputs, parser)
 		);
 
-		printStats(parser.getData());
-		await emitAnnotations(parser.getData());
+		let data = parser.getData();
+		data = filterData(inputs, data);
 
-		checkFail(exitCode, inputs, parser.getData());
+		printStats(data);
+		await emitAnnotations(data);
+
+		checkFail(exitCode, inputs, data);
 	} catch (e) {
 		core.setFailed(e.message);
 	}

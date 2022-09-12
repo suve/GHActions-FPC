@@ -115,6 +115,8 @@ function parseVerbosityFlags(name) {
 		}
 	}
 
+	// Provide "fatal" in addition to "error" for convenience
+	result.fatal = result.error;
 	return result;
 }
 
