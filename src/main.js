@@ -99,11 +99,11 @@ function checkFail(exitCode, inputs, parserData) {
 
 function filterData(inputs, data) {
 	// No other filtering done currently
-	if(inputs.userDefined) return data;
+	if(inputs.userDefined === null) return data;
 
 	const filterFunc = function(message) {
 		if(!message.userDefined) return true;
-		return inputs.failOn[message.type];
+		return inputs.userDefined[message.type];
 	}
 
 	for(let type in data.byType) {

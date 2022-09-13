@@ -27,7 +27,7 @@ inputs:
   user-defined:
     description: 'Display user-defined messages'
     required: false
-    default: 'true'
+    default: '*'
   verbosity:
     description: 'Verbosity level'
     required: false

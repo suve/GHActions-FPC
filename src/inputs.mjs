@@ -60,19 +60,10 @@ function getSource() {
 }
 
 function getUserDefined() {
-	const value = core.getInput("user-defined").trim().toLowerCase();
-	switch(value) {
-		case "1":
-		case "true":
-			return true;
+	const value = core.getInput("user-defined");
+	if(value === '*') return null;
 
-		case "0":
-		case "false":
-			return false;
-
-		default:
-			throw new Error(`Value for the "user-defined" input must be either "true" or "false" (got "${value}")`);
-	}
+	return parseVerbosityFlags("user-defined");
 }
 
 function getVerbosity() {
