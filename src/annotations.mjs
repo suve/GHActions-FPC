@@ -4,16 +4,15 @@ import * as path from 'path';
 
 import * as core from '@actions/core';
 
+const MESSAGE_TYPE_NAME = {
+	"fatal": "Fatal error",
+	"error": "Error",
+	"warning": "Warning",
+	"note": "Note",
+	"hint": "Hint",
+};
 
 function parserLineToAnnotationProps(line, fileDetails) {
-	const suffix = {
-		"fatal": "Fatal error",
-		"error": "Error",
-		"warning": "Warning",
-		"note": "Note",
-		"hint": "Hint",
-	};
-
 	const fileName = fileDetails.name;
 	const filePath = fileDetails.path;
 	const lineNo = (line.line > fileDetails.lineCount) ? fileDetails.lineCount : line.line;
@@ -32,9 +31,10 @@ function parserLineToAnnotationProps(line, fileDetails) {
 		props.startColumn = 1;
 	}
 
-	title += "): " + suffix[line.type];
-	props.title = title;
+	title += "): " + MESSAGE_TYPE_NAME[line.type];
+	if(line.userDefined) title += " (user defined)";
 
+	props.title = title;
 	return props;
 }
 

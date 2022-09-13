@@ -1,13 +1,20 @@
 import * as path from 'path';
 import * as process from 'process';
 
+const USER_DEFINED_PREFIX = "User defined: ";
+
 function Diagnostic(matches) {
 	this.path = path.normalize(matches[1]);
 	this.line = Number(matches[2]);
 	this.column = (matches[3] !== undefined) ? Number(matches[3]) : null;
 	this.type = matches[4].toLowerCase();
-	this.message = matches[5];
-	this.userDefined = this.message.startsWith("User defined:")
+
+	this.userDefined = matches[5].startsWith(USER_DEFINED_PREFIX);
+	if(this.userDefined) {
+		this.message = matches[5].slice(USER_DEFINED_PREFIX.length);
+	} else {
+		this.message = matches[5];
+	}
 }
 
 function Parser(excludePath) {
