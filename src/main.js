@@ -135,9 +135,9 @@ async function main() {
 		);
 
 		let data = parser.getData();
-		data = filterData(inputs, data);
-
 		printStats(data);
+
+		data = filterData(inputs, data);
 		await emitAnnotations(data);
 
 		checkFail(exitCode, inputs, data);
